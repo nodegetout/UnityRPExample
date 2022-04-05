@@ -12,6 +12,8 @@ namespace ScorpioEngine.Rendering.Runtime
         private Camera m_Camera;
         private CullingResults m_CullingResults;
 
+        private Lighting m_Lighting = new Lighting();
+
         private CommandBuffer m_CommandBuffer = new CommandBuffer()
         {
             name = k_BufferName
@@ -32,6 +34,7 @@ namespace ScorpioEngine.Rendering.Runtime
             }
 
             Setup();
+            m_Lighting.Setup(context, m_CullingResults);
             DrawVisibleGeometry(useDynamicBatching, useGPUInstancing);
             
             DrawUnsupportedShaders();

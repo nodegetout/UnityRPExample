@@ -13,9 +13,10 @@ namespace ScorpioEngine.Rendering.Runtime
         public ScorpioRenderPipeline(
             bool useDynamicBatching, bool useGPUInstancing, bool useSRPBatcher)
         {
-            GraphicsSettings.useScriptableRenderPipelineBatching = useSRPBatcher;
             b_UseDynamicBatching = useDynamicBatching;
             b_UseGPUInstancing = useGPUInstancing;
+            GraphicsSettings.useScriptableRenderPipelineBatching = useSRPBatcher;
+            GraphicsSettings.lightsUseLinearIntensity = true;
         }
         
         protected override void Render(ScriptableRenderContext context, Camera[] cameras)
