@@ -8,6 +8,7 @@ struct Surface
     half3 viewDirectionWS;
     half smoothness;
     half metallic;
+    half ambientOcclusion;
     half alpha;
 };
 

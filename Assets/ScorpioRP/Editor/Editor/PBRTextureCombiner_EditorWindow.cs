@@ -55,20 +55,13 @@ namespace ScorpioRP.Editor.Editor
             {
                 return null;
             }
-
-            bool hasSameWidth  = roughness.width != metallic.width && roughness.width != ao.width;
-            bool hasSameHeight = roughness.height != metallic.height && roughness.height != ao.height;
-            if (!hasSameWidth || !hasSameHeight)
-            {
-                return null;
-            }
-
+    
             int width  = roughness.width;
             int height = roughness.height;
             
             Debug.Log($"{width} - {height}");
 
-            Texture2D result = new Texture2D(width, height, TextureFormat.RGB24, false);
+            Texture2D result = new Texture2D(width, height);
             Color color;
             // result.set
             for (int i = 0; i < width; i++)
@@ -91,12 +84,26 @@ namespace ScorpioRP.Editor.Editor
                 return;
             }
 
-            var bytes = tex.EncodeToPNG();
-            Object.Destroy(tex);
-        
+            var bytes = tex.EncodeToTGA();
+            
+            // AssetDatabase.CreateAsset(tex, path);
+
             // string targetPath = Path.Combine(Application.dataPath, AssetDatabase.GetAssetPath(tex));
             // Write the returned byte array to a file in the project folder
-            File.WriteAllBytes(Application.dataPath, bytes);
+            if (bytes != null)
+            {
+                Debug.Log($"{Application.dataPath + path.Substring(6)}");
+                File.WriteAllBytes(Application.dataPath + path.Substring(6), bytes);
+            }
+            AssetDatabase.Refresh();
+            
+            // // var dirPath = Application.dataPath + "/../SaveImages/";
+            // var dirPath = Application.dataPath + path;
+            // if(!Directory.Exists(dirPath)) {
+            //     Directory.CreateDirectory(dirPath);
+            // }
+            // Debug.Log($"{dirPath}");
+            // File.WriteAllBytes(dirPath/* + "Image" + ".tga"*/, bytes);
         }
     }
 }
