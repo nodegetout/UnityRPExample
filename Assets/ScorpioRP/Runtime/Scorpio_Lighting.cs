@@ -16,7 +16,7 @@ namespace ScorpioEngine.Rendering.Runtime
         private static Vector4[] s_DirectionalLightColors = new Vector4[k_MaxDirectionalLightCount];
         private static Vector4[] s_DirectionalLightDirections = new Vector4[k_MaxDirectionalLightCount];
 
-        CommandBuffer m_Buffer = new CommandBuffer
+        CommandBuffer m_Buffer = new()
         {
             name = k_BufferName
         };

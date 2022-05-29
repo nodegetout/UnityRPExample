@@ -6,11 +6,19 @@ using UnityEngine;
 public class SPerObjectMaterialProperty : MonoBehaviour
 {
     private MaterialPropertyBlock m_MaterialPropertyBlock;
+    private MeshRenderer m_MeshRenderer;
 
-    [SerializeField] private Color m_BaseColor;
     [SerializeField]
+    private Color m_BaseColor = Color.white;
+    
     [Range(0f, 1f)]
-    private float m_Cutoff;
+    public float m_Roughness = 0.0f;
+
+    [Range(0f, 1f)]
+    public float m_Metallic = 0.5f;
+
+    [Range(0f, 1f)]
+    public float m_Cutoff;
 
     MaterialPropertyBlock materialPropertyBlock
     {
@@ -21,9 +29,23 @@ public class SPerObjectMaterialProperty : MonoBehaviour
         }
     }
 
+    MeshRenderer meshRenderer
+    {
+        get
+        {
+            if (m_MeshRenderer == null)
+            {
+                m_MeshRenderer = GetComponent<MeshRenderer>();
+            }
+
+            return m_MeshRenderer;
+        }
+    }
+
     private void Start()
     {
-        m_BaseColor = Random.ColorHSV().gamma;
+        
+        // m_BaseColor = Random.ColorHSV().linear;
         UpdateMaterialPropertyBlock();
     }
 
@@ -36,8 +58,11 @@ public class SPerObjectMaterialProperty : MonoBehaviour
 
     void UpdateMaterialPropertyBlock()
     {
+        meshRenderer.GetPropertyBlock(materialPropertyBlock);
         materialPropertyBlock.SetColor(SShaderPropertyId.s_BaseColorPropertyId, m_BaseColor);
+        materialPropertyBlock.SetFloat(SShaderPropertyId.s_SmoothnessPropertyId, m_Roughness);
+        materialPropertyBlock.SetFloat(SShaderPropertyId.s_MetallicPropertyId,  m_Metallic);
         materialPropertyBlock.SetFloat(SShaderPropertyId.s_CutoffPropertyId, m_Cutoff);
-        GetComponent<Renderer>().SetPropertyBlock(materialPropertyBlock);
+        meshRenderer.SetPropertyBlock(materialPropertyBlock);
     }
 }

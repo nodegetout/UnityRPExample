@@ -4,16 +4,17 @@
 #define MAX_DIRECTIONAL_LIGHT_COUNT 4
 
 CBUFFER_START(_CustomLight)
-    int   _DirectionalLightCount;
+    uint _DirectionalLightCount;
     half3 _DirectionalLightColors[MAX_DIRECTIONAL_LIGHT_COUNT];
     half3 _DirectionalLightDirections[MAX_DIRECTIONAL_LIGHT_COUNT];
 CBUFFER_END
 
 struct Light
 {
-    half3 color;
-    half3 direction;
-    float attenuation;
+    half3   direction;
+    half3   color;
+    half    distanceAttenuation;
+    half    shadowAttenuation;
 };
 
 int GetDirectionalLightCount()
@@ -23,10 +24,10 @@ int GetDirectionalLightCount()
 
 Light GetDirectionalLight(int index)
 {
-    Light light;
+    Light light = (Light) 0;
     light.color = _DirectionalLightColors[index].rgb;
-    light.direction = _DirectionalLightDirections[index].xyz;
-    light.attenuation = 1.0;
+    light.direction = normalize(_DirectionalLightDirections[index].xyz);
+    light.distanceAttenuation = 1.0;
     return light;
 }
 

@@ -5,9 +5,6 @@
 //                      Constant Buffers                                     //
 ///////////////////////////////////////////////////////////////////////////////
 
-half4 _GlossyEnvironmentColor;
-half4 _SubtractiveShadowColor;
-
 #define _InvCameraViewProj unity_MatrixInvVP
 float4 _ScaledScreenParams;
 

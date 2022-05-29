@@ -3,9 +3,12 @@
 
 struct Surface
 {
-    half3 color;
+    half3 albedo;
     half3 normal;
-    half  alpha;
+    half3 viewDirectionWS;
+    half smoothness;
+    half metallic;
+    half alpha;
 };
 
 #endif
