@@ -2,8 +2,9 @@
 #define _SCORPIO_LIT_INPUT_INCLUDED
 
 #include "../ShaderLibrary/SCommon.hlsl"
-#include "../ShaderLibrary/SSurface.hlsl"
+#include "../ShaderLibrary/SUtils.hlsl"
 #include "../ShaderLibrary/SLight.hlsl"
+#include "../ShaderLibrary/SSurface.hlsl"
 #include "../ShaderLibrary/SBRDF.hlsl"
 #include "../ShaderLibrary/SLighting.hlsl"
 
@@ -33,10 +34,8 @@ sampler2D _BaseMap;
 sampler2D _NormalMap;
 sampler2D _PBRMap;
 
-// CBUFFER_START(UnityPerMaterial)
-// half4 _MainTex_ST;
-// half4 _BaseColor;
-// CBUFFER_END
+// #define INSTANCED_PROP(type, prop_name) UNITY_DEFINE_INSTANCED_PROP(half4, #prop_name)
+#define ACCESS_PROP(prop_name) UNITY_ACCESS_INSTANCED_PROP(_#prop_name)
 
 UNITY_INSTANCING_BUFFER_START(Props)
     UNITY_DEFINE_INSTANCED_PROP(half4, _BaseMap_ST)

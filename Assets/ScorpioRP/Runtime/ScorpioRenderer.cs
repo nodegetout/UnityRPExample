@@ -6,6 +6,7 @@ namespace ScorpioEngine.Rendering.Runtime
     public partial class ScorpioRenderer
     {
         private static ShaderTagId s_UnlitShaderTagId = new ShaderTagId("SRPDefaultUnlit");
+        private static ShaderTagId s_ForwardLitShaderTagId = new ShaderTagId("ScorpioForward");
         private const string k_BufferName = "Scorpio Renderer";
         
         private ScriptableRenderContext m_Context;
@@ -77,6 +78,7 @@ namespace ScorpioEngine.Rendering.Runtime
                 enableInstancing = useInstancing,
                 enableDynamicBatching = useDynamicBatching
             };
+            drawingSettings.SetShaderPassName(1, s_ForwardLitShaderTagId);
             var filteringSettings = new FilteringSettings(RenderQueueRange.opaque);
             m_Context.DrawRenderers(m_CullingResults, ref drawingSettings, ref filteringSettings);
             

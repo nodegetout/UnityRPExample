@@ -4,6 +4,7 @@
     {
         [Enum(UnityEngine.Rendering.BlendMode)]_SrcBlend("Src Blend", Float) = 0
         [Enum(UnityEngine.Rendering.BlendMode)]_DstBlend("Dst Blend", Float) = 0
+        [Enum(UnityEngine.Rendering.CullMode)] _CullMode("Cull Mode", Float) = 2
         _BaseMap ("Texture", 2D) = "white" {}
         _BaseColor("Tint Color", Color) = (1,1,1,1)
         _NormalMap ("Normal Map", 2D) = "bump" {}
@@ -21,6 +22,12 @@
 
         Pass
         {
+            Tags
+            {
+                "LightMode" = "ScorpioForward"
+            }
+            Cull [_CullMode]
+            
             HLSLPROGRAM
             // OpenGL 3.5 - es 3.0
             #pragma target 3.0

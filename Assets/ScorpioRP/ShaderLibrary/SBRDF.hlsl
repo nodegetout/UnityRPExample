@@ -4,40 +4,6 @@
 #define MIN_REFLECTIVITY 0.04
 half4 kDielectricSpec =  half4(0.04, 0.04, 0.04, 1 - 0.04);
 
-struct PBSDirections
-{
-    float3 normalWS;
-    float3 lightDirWS;
-    float3 viewDirWS;
-    float3 halfVectorWS;
-
-    // dots
-    float nDotL;
-    float nDotH;
-    float nDotV;
-
-    float hDotL;
-    float hDotV;
-};
-
-PBSDirections CreatePBSDirections(float3 normalWS, float3 lightDirWS, float3 positionWS)
-{
-    PBSDirections directions = (PBSDirections) 0;
-    directions.normalWS = normalize(normalWS);
-    directions.lightDirWS = normalize(lightDirWS);
-    directions.viewDirWS = normalize(_WorldSpaceCameraPos.xyz - positionWS.xyz);
-    directions.halfVectorWS = normalize(directions.lightDirWS + directions.viewDirWS);
-
-    directions.nDotL = max(dot(directions.normalWS, directions.lightDirWS), 0.0001);
-    directions.nDotH = max(dot(directions.normalWS, directions.halfVectorWS), 0.0001);
-    directions.nDotV = max(dot(directions.normalWS, directions.viewDirWS), 0.0001);
-    
-    directions.hDotL = max(dot(directions.halfVectorWS, directions.lightDirWS), 0.0001);
-    directions.hDotV = max(dot(directions.halfVectorWS, directions.viewDirWS), 0.0001);
-
-    return directions;
-}
-
 // ----------------------------------------------------------------------------
 float DistributionGGX(float3 N, float3 H, float roughness)
 {
@@ -77,6 +43,36 @@ float GeometrySmith(float3 N, float3 V, float3 L, float roughness)
 float3 fresnelSchlick(float cosTheta, float3 F0)
 {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+float3 LightingPhysicallyBased(Surface surface, PBSDirections directions, Light light)
+{
+    float3 F0 = lerp(surface.albedo, surface.metallic, kDielectricSpec.rgb);
+    // Cook-Torrance BRDF
+    float  NDF = DistributionGGX(directions.normalWS, directions.halfVectorWS, surface.smoothness);   
+    float  G   = GeometrySmith(directions.normalWS, directions.viewDirWS, directions.lightDirWS, surface.smoothness);      
+    float3 F   = fresnelSchlick(clamp(directions.hDotV, 0.0, 1.0), F0);
+           
+    float3 numerator  = NDF * G * F;
+    // + 0.0001 to prevent divide by zero
+    float denominator = 4.0 * directions.nDotV * directions.nDotL + 0.0001;
+    float3 specular   = numerator / denominator;
+        
+    // kS is equal to Fresnel
+    float3 kS = F;
+    // for energy conservation, the diffuse and specular light can't
+    // be above 1.0 (unless the surface emits light); to preserve this
+    // relationship the diffuse component (kD) should equal 1.0 - kS.
+    float3 kD = 1.0 - kS;
+    // multiply kD by the inverse metalness such that only non-metals 
+    // have diffuse lighting, or a linear blend if partly metal (pure metals
+    // have no diffuse light).
+    kD *= 1.0 - surface.metallic;
+    
+    // add to outgoing radiance Lo
+    // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+    float3 directRadiance = (kD * surface.albedo / PI + specular ) * light.color * directions.hDotL;
+    return directRadiance;
 }
 
 #endif

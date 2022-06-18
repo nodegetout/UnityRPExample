@@ -5,6 +5,7 @@
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Packing.hlsl"
 #include "./SUnityInput.hlsl"
+// #include "./SUtils.hlsl"
 
 float Square (float v)
 {
