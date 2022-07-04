@@ -1,6 +1,15 @@
 #ifndef _SCORPIO_BRDF_INCLUDED
 #define _SCORPIO_BRDF_INCLUDED
 
+struct BRDF
+{
+    float3 diffuse;
+    float3 specular;
+
+    float roughness;
+    
+};
+
 #define MIN_REFLECTIVITY 0.04
 half4 kDielectricSpec =  half4(0.04, 0.04, 0.04, 1 - 0.04);
 

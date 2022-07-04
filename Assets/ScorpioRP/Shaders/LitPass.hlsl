@@ -42,43 +42,38 @@ half4 LitPassFragment (Varyings input) : SV_Target
     float3 normalWS = mul(TBN, normalTS);
     float3 positionWS = float3(input.tToW0.w, input.tToW1.w, input.tToW2.w);
 
-    Light mainLight = GetDirectionalLight(0);
-    PBSDirections directions = CreatePBSDirections(normalWS, mainLight.direction, positionWS.xyz);
-
     float smoothness = UNITY_ACCESS_INSTANCED_PROP(Props, _Smoothness);
     float metallic   = UNITY_ACCESS_INSTANCED_PROP(Props, _Metallic);
-    Surface surface = InitSurfaceData(baseColor, SpecularParams, directions, smoothness, metallic);
 
-    // float3 F0 = float3(0.04); 
-    // F0 = mix(F0, albedo, metallic);
-    // return half4(F0, surface.alpha);
+    Surface surface = InitSurfaceData(baseColor, SpecularParams, normalWS, positionWS, smoothness, metallic);
 
-    // calculate per-light radiance
-    // float3 L = normalize(mainLight.direction - positionWS);
-    // float3 H = normalize(V + L);
-    // float distance = length(mainLight.direction - positionWS);
-    // float attenuation = 1.0 / (distance * distance);
-    // float3 radiance = mainLight.color * attenuation;
-    // return half4(radiance, 1);
-
-    float3 directRadiance = LightingPhysicallyBased(surface, directions, mainLight);
-
-    // return half4(directRadiance, 1);
+    // direct 
+    int realtimeLightCount = GetDirectionalLightCount();
+    float3 color = 0;
+    UNITY_LOOP
+    for (int i = 0; i < realtimeLightCount; ++i)
+    {
+        Light dirLight = GetDirectionalLight(i);
+        PBSDirections directions = CreatePBSDirections(normalWS, dirLight.direction, positionWS.xyz);
+        float3 directRadiance = LightingPhysicallyBased(surface, directions, dirLight);
+        color += directRadiance;
+    }
+    
     // ambient lighting (note that the next IBL tutorial will replace 
     // this ambient lighting with environment lighting).
     float3 ambient = 0.03 * surface.albedo * surface.ambientOcclusion;
-    float3 color = ambient + directRadiance;
+    
 
     // HDR tonemapping
     // color = color / (color + 1.0);
     // gamma correct
     // color = pow(color, 0.4545); 
     
-    #if defined(_CLIPPING)
-        clip(surface.alpha - UNITY_ACCESS_INSTANCED_PROP(Props, _Cutoff));
-    #endif
+    // #if defined(_CLIPPING)
+    //     clip(baseColor.a - UNITY_ACCESS_INSTANCED_PROP(Props, _Cutoff));
+    // #endif
     
-    return half4(color, surface.alpha);
+    return half4(color, baseColor.a);
 }
 
 #endif
